@@ -1,0 +1,13 @@
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator'
+
+export class LoginDTO {
+	@IsString({ message: 'Логин должен быть строковыми данными.' })
+	@IsNotEmpty({ message: 'Логин обязателен для ввода.' })
+	login: string
+
+	@IsString({ message: 'Пароль должен быть строковыми данными.' })
+	@IsNotEmpty({ message: 'Пароль обязателен для ввода.' })
+	@MinLength(8, { message: 'Пароль должен содержать минимум 8 символов.' })
+	@MaxLength(40, { message: 'Паоль должен содержать не более 40 символов.' })
+	password: string
+}

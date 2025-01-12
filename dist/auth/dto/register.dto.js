@@ -1,0 +1,60 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RegisterDTO = void 0;
+const is_password_matching_decorator_1 = require("../../libs/common/decorators/is-password-matching.decorator");
+const class_validator_1 = require("class-validator");
+class RegisterDTO {
+}
+exports.RegisterDTO = RegisterDTO;
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Логин должен быть строковыми данными.' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Логин обязателен для ввода.' }),
+    __metadata("design:type", String)
+], RegisterDTO.prototype, "login", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Email должен быть строковыми данными.' }),
+    (0, class_validator_1.IsEmail)({}, { message: 'Некорректный формат email' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Email обязателен для ввода.' }),
+    __metadata("design:type", String)
+], RegisterDTO.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Пароль должен быть строковыми данными.' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Пароль обязателен для ввода.' }),
+    (0, class_validator_1.MinLength)(8, { message: 'Пароль должен содержать минимум 8 символов.' }),
+    (0, class_validator_1.MaxLength)(40, { message: 'Паоль должен содержать не более 40 символов.' }),
+    __metadata("design:type", String)
+], RegisterDTO.prototype, "password", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Имя должен быть строковыми данными.' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Имя обязателен для ввода.' }),
+    __metadata("design:type", String)
+], RegisterDTO.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Фамилия должен быть строковыми данными.' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Фамилия обязателен для ввода.' }),
+    __metadata("design:type", String)
+], RegisterDTO.prototype, "surname", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Отчество должен быть строковыми данными.' }),
+    __metadata("design:type", String)
+], RegisterDTO.prototype, "secondname", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({
+        message: 'Пароль подтверждения должен быть строковыми данными.'
+    }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Пароль подтверждения обязателен для ввода.' }),
+    (0, class_validator_1.MinLength)(8, { message: 'Пароль должен содержать минимум 8 символов.' }),
+    (0, class_validator_1.MaxLength)(40, { message: 'Паоль должен содержать не более 40 символов.' }),
+    (0, class_validator_1.Validate)(is_password_matching_decorator_1.IsPasswordMatchingConstrait, { message: 'Пароли не совпадают' }),
+    __metadata("design:type", String)
+], RegisterDTO.prototype, "passwordRepeat", void 0);
+//# sourceMappingURL=register.dto.js.map
