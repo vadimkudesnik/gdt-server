@@ -40,9 +40,6 @@ let UserService = class UserService {
                 accounts: true
             }
         });
-        if (!user) {
-            throw new common_1.NotFoundException('Пользователь не найден. Проверьте введенные данные.');
-        }
         return user;
     }
     async findByLogin(login) {
@@ -54,9 +51,6 @@ let UserService = class UserService {
                 accounts: true
             }
         });
-        if (!user) {
-            throw new common_1.NotFoundException('Пользователь не найден. Проверьте введенные данные.');
-        }
         return user;
     }
     async create(login, email, password, name, surname, secondname, picture, method, isVerified) {

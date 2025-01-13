@@ -36,12 +36,6 @@ export class UserService {
 			}
 		})
 
-		if (!user) {
-			throw new NotFoundException(
-				'Пользователь не найден. Проверьте введенные данные.'
-			)
-		}
-
 		return user
 	}
 
@@ -54,12 +48,6 @@ export class UserService {
 				accounts: true
 			}
 		})
-
-		if (!user) {
-			throw new NotFoundException(
-				'Пользователь не найден. Проверьте введенные данные.'
-			)
-		}
 
 		return user
 	}

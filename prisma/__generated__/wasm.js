@@ -128,7 +128,6 @@ exports.Prisma.UserScalarFieldEnum = {
   picture: 'picture',
   isAdmin: 'isAdmin',
   isNewsManager: 'isNewsManager',
-  roles: 'roles',
   isVerified: 'isVerified',
   isTwoFactorEnabled: 'isTwoFactorEnabled',
   method: 'method',
@@ -173,12 +172,6 @@ exports.Prisma.NullsOrder = {
 exports.AuthMethod = exports.$Enums.AuthMethod = {
   CREDENTIAL: 'CREDENTIAL',
   YANDEX: 'YANDEX'
-};
-
-exports.Role = exports.$Enums.Role = {
-  REGULAR: 'REGULAR',
-  NEWS_MANAGER: 'NEWS_MANAGER',
-  ADMIN: 'ADMIN'
 };
 
 exports.TokenType = exports.$Enums.TokenType = {

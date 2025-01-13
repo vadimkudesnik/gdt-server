@@ -27,8 +27,6 @@ model User {
   isAdmin       Boolean @default(false) @map("is_admin")
   isNewsManager Boolean @default(false) @map("is_news_manager")
 
-  roles Role[] @default([REGULAR])
-
   //Ключи
   isVerified         Boolean @default(false) @map("is_verified")
   isTwoFactorEnabled Boolean @default(false) @map("is_two_factor_enabled")
@@ -87,10 +85,4 @@ enum TokenType {
   VERIFICATION
   TWO_FACTOR
   PASSWORD_RESET
-}
-
-enum Role {
-  REGULAR
-  NEWS_MANAGER
-  ADMIN
 }

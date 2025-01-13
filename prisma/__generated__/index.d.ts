@@ -49,15 +49,6 @@ export const TokenType: {
 
 export type TokenType = (typeof TokenType)[keyof typeof TokenType]
 
-
-export const Role: {
-  REGULAR: 'REGULAR',
-  NEWS_MANAGER: 'NEWS_MANAGER',
-  ADMIN: 'ADMIN'
-};
-
-export type Role = (typeof Role)[keyof typeof Role]
-
 }
 
 export type AuthMethod = $Enums.AuthMethod
@@ -67,10 +58,6 @@ export const AuthMethod: typeof $Enums.AuthMethod
 export type TokenType = $Enums.TokenType
 
 export const TokenType: typeof $Enums.TokenType
-
-export type Role = $Enums.Role
-
-export const Role: typeof $Enums.Role
 
 /**
  * ##  Prisma Client ʲˢ
@@ -1178,7 +1165,6 @@ export namespace Prisma {
     picture: number
     isAdmin: number
     isNewsManager: number
-    roles: number
     isVerified: number
     isTwoFactorEnabled: number
     method: number
@@ -1235,7 +1221,6 @@ export namespace Prisma {
     picture?: true
     isAdmin?: true
     isNewsManager?: true
-    roles?: true
     isVerified?: true
     isTwoFactorEnabled?: true
     method?: true
@@ -1327,7 +1312,6 @@ export namespace Prisma {
     picture: string | null
     isAdmin: boolean
     isNewsManager: boolean
-    roles: $Enums.Role[]
     isVerified: boolean
     isTwoFactorEnabled: boolean
     method: $Enums.AuthMethod
@@ -1363,7 +1347,6 @@ export namespace Prisma {
     picture?: boolean
     isAdmin?: boolean
     isNewsManager?: boolean
-    roles?: boolean
     isVerified?: boolean
     isTwoFactorEnabled?: boolean
     method?: boolean
@@ -1384,7 +1367,6 @@ export namespace Prisma {
     picture?: boolean
     isAdmin?: boolean
     isNewsManager?: boolean
-    roles?: boolean
     isVerified?: boolean
     isTwoFactorEnabled?: boolean
     method?: boolean
@@ -1403,7 +1385,6 @@ export namespace Prisma {
     picture?: boolean
     isAdmin?: boolean
     isNewsManager?: boolean
-    roles?: boolean
     isVerified?: boolean
     isTwoFactorEnabled?: boolean
     method?: boolean
@@ -1422,7 +1403,6 @@ export namespace Prisma {
     picture?: boolean
     isAdmin?: boolean
     isNewsManager?: boolean
-    roles?: boolean
     isVerified?: boolean
     isTwoFactorEnabled?: boolean
     method?: boolean
@@ -1430,7 +1410,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "login" | "email" | "password" | "name" | "surname" | "secondname" | "picture" | "isAdmin" | "isNewsManager" | "roles" | "isVerified" | "isTwoFactorEnabled" | "method" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "login" | "email" | "password" | "name" | "surname" | "secondname" | "picture" | "isAdmin" | "isNewsManager" | "isVerified" | "isTwoFactorEnabled" | "method" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1454,7 +1434,6 @@ export namespace Prisma {
       picture: string | null
       isAdmin: boolean
       isNewsManager: boolean
-      roles: $Enums.Role[]
       isVerified: boolean
       isTwoFactorEnabled: boolean
       method: $Enums.AuthMethod
@@ -1894,7 +1873,6 @@ export namespace Prisma {
     readonly picture: FieldRef<"User", 'String'>
     readonly isAdmin: FieldRef<"User", 'Boolean'>
     readonly isNewsManager: FieldRef<"User", 'Boolean'>
-    readonly roles: FieldRef<"User", 'Role[]'>
     readonly isVerified: FieldRef<"User", 'Boolean'>
     readonly isTwoFactorEnabled: FieldRef<"User", 'Boolean'>
     readonly method: FieldRef<"User", 'AuthMethod'>
@@ -4477,7 +4455,6 @@ export namespace Prisma {
     picture: 'picture',
     isAdmin: 'isAdmin',
     isNewsManager: 'isNewsManager',
-    roles: 'roles',
     isVerified: 'isVerified',
     isTwoFactorEnabled: 'isTwoFactorEnabled',
     method: 'method',
@@ -4561,20 +4538,6 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
-   * Reference to a field of type 'Role[]'
-   */
-  export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Role'
-   */
-  export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role'>
     
 
 
@@ -4665,7 +4628,6 @@ export namespace Prisma {
     picture?: StringNullableFilter<"User"> | string | null
     isAdmin?: BoolFilter<"User"> | boolean
     isNewsManager?: BoolFilter<"User"> | boolean
-    roles?: EnumRoleNullableListFilter<"User">
     isVerified?: BoolFilter<"User"> | boolean
     isTwoFactorEnabled?: BoolFilter<"User"> | boolean
     method?: EnumAuthMethodFilter<"User"> | $Enums.AuthMethod
@@ -4685,7 +4647,6 @@ export namespace Prisma {
     picture?: SortOrderInput | SortOrder
     isAdmin?: SortOrder
     isNewsManager?: SortOrder
-    roles?: SortOrder
     isVerified?: SortOrder
     isTwoFactorEnabled?: SortOrder
     method?: SortOrder
@@ -4708,7 +4669,6 @@ export namespace Prisma {
     picture?: StringNullableFilter<"User"> | string | null
     isAdmin?: BoolFilter<"User"> | boolean
     isNewsManager?: BoolFilter<"User"> | boolean
-    roles?: EnumRoleNullableListFilter<"User">
     isVerified?: BoolFilter<"User"> | boolean
     isTwoFactorEnabled?: BoolFilter<"User"> | boolean
     method?: EnumAuthMethodFilter<"User"> | $Enums.AuthMethod
@@ -4728,7 +4688,6 @@ export namespace Prisma {
     picture?: SortOrderInput | SortOrder
     isAdmin?: SortOrder
     isNewsManager?: SortOrder
-    roles?: SortOrder
     isVerified?: SortOrder
     isTwoFactorEnabled?: SortOrder
     method?: SortOrder
@@ -4753,7 +4712,6 @@ export namespace Prisma {
     picture?: StringNullableWithAggregatesFilter<"User"> | string | null
     isAdmin?: BoolWithAggregatesFilter<"User"> | boolean
     isNewsManager?: BoolWithAggregatesFilter<"User"> | boolean
-    roles?: EnumRoleNullableListFilter<"User">
     isVerified?: BoolWithAggregatesFilter<"User"> | boolean
     isTwoFactorEnabled?: BoolWithAggregatesFilter<"User"> | boolean
     method?: EnumAuthMethodWithAggregatesFilter<"User"> | $Enums.AuthMethod
@@ -4901,7 +4859,6 @@ export namespace Prisma {
     picture?: string | null
     isAdmin?: boolean
     isNewsManager?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
     isVerified?: boolean
     isTwoFactorEnabled?: boolean
     method?: $Enums.AuthMethod
@@ -4921,7 +4878,6 @@ export namespace Prisma {
     picture?: string | null
     isAdmin?: boolean
     isNewsManager?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
     isVerified?: boolean
     isTwoFactorEnabled?: boolean
     method?: $Enums.AuthMethod
@@ -4941,7 +4897,6 @@ export namespace Prisma {
     picture?: NullableStringFieldUpdateOperationsInput | string | null
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isNewsManager?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isTwoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -4961,7 +4916,6 @@ export namespace Prisma {
     picture?: NullableStringFieldUpdateOperationsInput | string | null
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isNewsManager?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isTwoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -4981,7 +4935,6 @@ export namespace Prisma {
     picture?: string | null
     isAdmin?: boolean
     isNewsManager?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
     isVerified?: boolean
     isTwoFactorEnabled?: boolean
     method?: $Enums.AuthMethod
@@ -5000,7 +4953,6 @@ export namespace Prisma {
     picture?: NullableStringFieldUpdateOperationsInput | string | null
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isNewsManager?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isTwoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -5019,7 +4971,6 @@ export namespace Prisma {
     picture?: NullableStringFieldUpdateOperationsInput | string | null
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isNewsManager?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isTwoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -5201,14 +5152,6 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
-  export type EnumRoleNullableListFilter<$PrismaModel = never> = {
-    equals?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel> | null
-    has?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel> | null
-    hasEvery?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    hasSome?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    isEmpty?: boolean
-  }
-
   export type EnumAuthMethodFilter<$PrismaModel = never> = {
     equals?: $Enums.AuthMethod | EnumAuthMethodFieldRefInput<$PrismaModel>
     in?: $Enums.AuthMethod[] | ListEnumAuthMethodFieldRefInput<$PrismaModel>
@@ -5253,7 +5196,6 @@ export namespace Prisma {
     picture?: SortOrder
     isAdmin?: SortOrder
     isNewsManager?: SortOrder
-    roles?: SortOrder
     isVerified?: SortOrder
     isTwoFactorEnabled?: SortOrder
     method?: SortOrder
@@ -5482,10 +5424,6 @@ export namespace Prisma {
     _max?: NestedEnumTokenTypeFilter<$PrismaModel>
   }
 
-  export type UserCreaterolesInput = {
-    set: $Enums.Role[]
-  }
-
   export type AccountCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -5510,11 +5448,6 @@ export namespace Prisma {
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
-  }
-
-  export type UserUpdaterolesInput = {
-    set?: $Enums.Role[]
-    push?: $Enums.Role | $Enums.Role[]
   }
 
   export type EnumAuthMethodFieldUpdateOperationsInput = {
@@ -5838,7 +5771,6 @@ export namespace Prisma {
     picture?: string | null
     isAdmin?: boolean
     isNewsManager?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
     isVerified?: boolean
     isTwoFactorEnabled?: boolean
     method?: $Enums.AuthMethod
@@ -5857,7 +5789,6 @@ export namespace Prisma {
     picture?: string | null
     isAdmin?: boolean
     isNewsManager?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
     isVerified?: boolean
     isTwoFactorEnabled?: boolean
     method?: $Enums.AuthMethod
@@ -5892,7 +5823,6 @@ export namespace Prisma {
     picture?: NullableStringFieldUpdateOperationsInput | string | null
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isNewsManager?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isTwoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -5911,7 +5841,6 @@ export namespace Prisma {
     picture?: NullableStringFieldUpdateOperationsInput | string | null
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isNewsManager?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     isTwoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
