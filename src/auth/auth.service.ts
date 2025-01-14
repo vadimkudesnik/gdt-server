@@ -21,7 +21,7 @@ export class AuthService {
 		private readonly configService: ConfigService
 	) {}
 
-	public async register(request: Request, dto: RegisterDTO) {
+	public async register(request: Request, dto: RegisterDTO): Promise<User> {
 		const isExistEmail = await this.userService.findByEmail(dto.email)
 		const isExistLogin = await this.userService.findByLogin(dto.login)
 
@@ -52,7 +52,7 @@ export class AuthService {
 		return this.saveSession(request, newUser)
 	}
 
-	public async login(request: Request, dto: LoginDTO) {
+	public async login(request: Request, dto: LoginDTO): Promise<User> {
 		const user = await this.userService.findByLogin(dto.login)
 		if (!user || !user.password) {
 			throw new NotFoundException('Пользователь не найден.')
@@ -64,7 +64,10 @@ export class AuthService {
 		return this.saveSession(request, user)
 	}
 
-	public async loginEmail(request: Request, dto: LoginEmailDTO) {
+	public async loginEmail(
+		request: Request,
+		dto: LoginEmailDTO
+	): Promise<User> {
 		const user = await this.userService.findByEmail(dto.email)
 		if (!user || !user.password) {
 			throw new NotFoundException('Пользователь не найден.')
@@ -94,8 +97,8 @@ export class AuthService {
 		})
 	}
 
-	private async saveSession(request: Request, user: User) {
-		return new Promise((resolve, reject) => {
+	private async saveSession(request: Request, user: User): Promise<User> {
+		return new Promise<User>((resolve, reject) => {
 			request.session.userId = user.id
 			request.session.save(error => {
 				if (error) {
@@ -105,7 +108,7 @@ export class AuthService {
 						)
 					)
 				}
-				resolve({ user })
+				resolve(user)
 			})
 		})
 	}

@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { CaptchaService } from './captcha.service';
-import { CaptchaController } from './captcha.controller';
+import { CaptchaController } from './captcha.controller'
+import { CaptchaService } from './captcha.service'
+import { Module } from '@nestjs/common'
 
 @Module({
-  controllers: [CaptchaController],
-  providers: [CaptchaService],
+	controllers: [CaptchaController],
+	providers: [CaptchaService]
 })
 export class CaptchaModule {}
