@@ -50,7 +50,7 @@ export class AuthService {
 				'Пользователь с данным логином уже существует.'
 			)
 		}
-		/*
+
 		const newUser = await this.userService.create(
 			dto.login,
 			dto.email,
@@ -68,7 +68,7 @@ export class AuthService {
 		return {
 			message: 'Пожалуйста подтвердите Ваш email или войдите в систему.'
 		}
-		*/
+
 		return {
 			message: 'Вы зарегестрированы. Войдите в систему.'
 		}
@@ -83,14 +83,14 @@ export class AuthService {
 		if (!isValidPassword) {
 			throw new UnauthorizedException('Неверный паорь.')
 		}
-		/*
+
 		if (!user.isVerified) {
 			await this.emailConfirmationService.sendVerificationToken(user)
 			throw new UnauthorizedException(
 				'Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.'
 			)
 		}
-		*/
+
 		return this.saveSession(request, user)
 	}
 

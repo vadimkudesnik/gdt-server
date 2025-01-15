@@ -38,6 +38,11 @@ let AuthService = class AuthService {
         if (isExistLogin) {
             throw new common_1.ConflictException('Пользователь с данным логином уже существует.');
         }
+        const newUser = await this.userService.create(dto.login, dto.email, dto.password, dto.name, dto.surname, dto.secondname, '', __generated__1.AuthMethod.CREDENTIAL, false);
+        await this.emailConfirmationService.sendVerificationToken(newUser);
+        return {
+            message: 'Пожалуйста подтвердите Ваш email или войдите в систему.'
+        };
         return {
             message: 'Вы зарегестрированы. Войдите в систему.'
         };
@@ -50,6 +55,10 @@ let AuthService = class AuthService {
         const isValidPassword = await (0, argon2_1.verify)(user.password, dto.password);
         if (!isValidPassword) {
             throw new common_1.UnauthorizedException('Неверный паорь.');
+        }
+        if (!user.isVerified) {
+            await this.emailConfirmationService.sendVerificationToken(user);
+            throw new common_1.UnauthorizedException('Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.');
         }
         return this.saveSession(request, user);
     }
