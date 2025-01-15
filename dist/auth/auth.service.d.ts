@@ -21,14 +21,14 @@ export declare class AuthService {
     login(request: Request, dto: LoginDTO): Promise<User>;
     loginEmail(request: Request, dto: LoginEmailDTO): Promise<User>;
     extractProfileFromCode(request: Request, provider: string, code: string): Promise<{
+        name: string;
+        id: string;
+        login: string;
         email: string;
         password: string;
-        login: string;
-        name: string;
         surname: string;
         secondname: string | null;
         picture: string | null;
-        id: string;
         isAdmin: boolean;
         isNewsManager: boolean;
         isVerified: boolean;

@@ -13,7 +13,7 @@ export class MailService {
 
 	public async sendConfirmationEmail(email: string, token: string) {
 		const domain =
-			await this.configService.getOrThrow<string>('ALLOWED_ORIGIN')
+			await this.configService.getOrThrow<string>('APPLICATION_URL')
 
 		const html = await render(ConfirmationTemlate({ domain, token }))
 

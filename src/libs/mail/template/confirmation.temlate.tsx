@@ -9,7 +9,7 @@ interface ConfirmationTemlateProps {
 }
 
 export function ConfirmationTemlate({ domain, token }: ConfirmationTemlateProps) {
-	const confirmationLink = `${domain}/auth/new-verification&token=${token}`
+	const confirmationLink = `${domain}/auth/new-verification?token=${token}`
     return (
         <Tailwind>
             <Html>

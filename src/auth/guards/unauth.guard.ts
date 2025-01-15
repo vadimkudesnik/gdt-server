@@ -1,6 +1,11 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
+import {
+	BadRequestException,
+	CanActivate,
+	ExecutionContext,
+	Injectable
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { Request, Response } from 'express'
+import { Request } from 'express'
 
 @Injectable()
 export class UnAuthGuard implements CanActivate {
@@ -9,12 +14,7 @@ export class UnAuthGuard implements CanActivate {
 	public async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest<Request>()
 		if (typeof request.session.userId !== 'undefined') {
-			const response = context.switchToHttp().getResponse<Response>()
-			response
-				.status(403)
-				.redirect(
-					`${this.configService.getOrThrow<string>('ALLOWED_ORIGIN')}/dashboard/settings`
-				)
+			throw new BadRequestException('Вы уже находитесь в системе.')
 		}
 
 		return true

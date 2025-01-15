@@ -3,6 +3,7 @@ import { LoginDTO } from './dto/login.dto'
 import { RegisterDTO } from './dto/register.dto'
 import { EmailConfirmationService } from './email-confirmation/email-confirmation.service'
 import { ProviderService } from './provider/provider.service'
+import { parseBoolean } from '@/libs/common/utils/parse-boolean.util'
 import { PrismaService } from '@/prisma/prisma.service'
 import { UserService } from '@/user/user.service'
 import {
@@ -62,15 +63,20 @@ export class AuthService {
 			AuthMethod.CREDENTIAL,
 			false
 		)
+		const enabledEmail = this.configService.getOrThrow<string>('MAIL')
+		if (parseBoolean(enabledEmail)) {
+			await this.emailConfirmationService.sendVerificationToken(newUser)
 
-		await this.emailConfirmationService.sendVerificationToken(newUser)
-
-		return {
-			message: 'Пожалуйста подтвердите Ваш email или войдите в систему.'
+			return {
+				message:
+					'Пожалуйста подтвердите Ваш email или войдите в систему.'
+			}
 		}
 
-		return {
-			message: 'Вы зарегестрированы. Войдите в систему.'
+		if (!parseBoolean(enabledEmail)) {
+			return {
+				message: 'Вы зарегестрированы. Войдите в систему.'
+			}
 		}
 	}
 
@@ -83,12 +89,14 @@ export class AuthService {
 		if (!isValidPassword) {
 			throw new UnauthorizedException('Неверный паорь.')
 		}
-
-		if (!user.isVerified) {
-			await this.emailConfirmationService.sendVerificationToken(user)
-			throw new UnauthorizedException(
-				'Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.'
-			)
+		const enabledEmail = this.configService.getOrThrow<string>('MAIL')
+		if (parseBoolean(enabledEmail)) {
+			if (!user.isVerified) {
+				await this.emailConfirmationService.sendVerificationToken(user)
+				throw new UnauthorizedException(
+					'Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.'
+				)
+			}
 		}
 
 		return this.saveSession(request, user)
@@ -106,12 +114,16 @@ export class AuthService {
 		if (!isValidPassword) {
 			throw new UnauthorizedException('Неверный пароль.')
 		}
-		if (!user.isVerified) {
-			await this.emailConfirmationService.sendVerificationToken(user)
-			throw new UnauthorizedException(
-				'Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.'
-			)
+		const enabledEmail = this.configService.getOrThrow<string>('MAIL')
+		if (parseBoolean(enabledEmail)) {
+			if (!user.isVerified) {
+				await this.emailConfirmationService.sendVerificationToken(user)
+				throw new UnauthorizedException(
+					'Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.'
+				)
+			}
 		}
+
 		return this.saveSession(request, user)
 	}
 

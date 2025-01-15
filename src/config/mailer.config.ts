@@ -15,6 +15,6 @@ export const getMailerConfig = async (
 		}
 	},
 	defaults: {
-		from: `"GDT Team"${configService.getOrThrow<string>('MAIL_LOGIN')}`
+		from: `${configService.getOrThrow<string>('MAIL_LOGIN')}`
 	}
 })

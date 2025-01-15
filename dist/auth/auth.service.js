@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const email_confirmation_service_1 = require("./email-confirmation/email-confirmation.service");
 const provider_service_1 = require("./provider/provider.service");
+const parse_boolean_util_1 = require("../libs/common/utils/parse-boolean.util");
 const prisma_service_1 = require("../prisma/prisma.service");
 const user_service_1 = require("../user/user.service");
 const common_1 = require("@nestjs/common");
@@ -39,13 +40,18 @@ let AuthService = class AuthService {
             throw new common_1.ConflictException('Пользователь с данным логином уже существует.');
         }
         const newUser = await this.userService.create(dto.login, dto.email, dto.password, dto.name, dto.surname, dto.secondname, '', __generated__1.AuthMethod.CREDENTIAL, false);
-        await this.emailConfirmationService.sendVerificationToken(newUser);
-        return {
-            message: 'Пожалуйста подтвердите Ваш email или войдите в систему.'
-        };
-        return {
-            message: 'Вы зарегестрированы. Войдите в систему.'
-        };
+        const enabledEmail = this.configService.getOrThrow('MAIL');
+        if ((0, parse_boolean_util_1.parseBoolean)(enabledEmail)) {
+            await this.emailConfirmationService.sendVerificationToken(newUser);
+            return {
+                message: 'Пожалуйста подтвердите Ваш email или войдите в систему.'
+            };
+        }
+        if (!(0, parse_boolean_util_1.parseBoolean)(enabledEmail)) {
+            return {
+                message: 'Вы зарегестрированы. Войдите в систему.'
+            };
+        }
     }
     async login(request, dto) {
         const user = await this.userService.findByLogin(dto.login);
@@ -56,9 +62,12 @@ let AuthService = class AuthService {
         if (!isValidPassword) {
             throw new common_1.UnauthorizedException('Неверный паорь.');
         }
-        if (!user.isVerified) {
-            await this.emailConfirmationService.sendVerificationToken(user);
-            throw new common_1.UnauthorizedException('Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.');
+        const enabledEmail = this.configService.getOrThrow('MAIL');
+        if ((0, parse_boolean_util_1.parseBoolean)(enabledEmail)) {
+            if (!user.isVerified) {
+                await this.emailConfirmationService.sendVerificationToken(user);
+                throw new common_1.UnauthorizedException('Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.');
+            }
         }
         return this.saveSession(request, user);
     }
@@ -71,9 +80,12 @@ let AuthService = class AuthService {
         if (!isValidPassword) {
             throw new common_1.UnauthorizedException('Неверный пароль.');
         }
-        if (!user.isVerified) {
-            await this.emailConfirmationService.sendVerificationToken(user);
-            throw new common_1.UnauthorizedException('Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.');
+        const enabledEmail = this.configService.getOrThrow('MAIL');
+        if ((0, parse_boolean_util_1.parseBoolean)(enabledEmail)) {
+            if (!user.isVerified) {
+                await this.emailConfirmationService.sendVerificationToken(user);
+                throw new common_1.UnauthorizedException('Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.');
+            }
         }
         return this.saveSession(request, user);
     }
