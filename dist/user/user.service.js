@@ -72,6 +72,21 @@ let UserService = class UserService {
         });
         return user;
     }
+    async edit(email, method, isVerified) {
+        const user = await this.prismaService.user.update({
+            where: {
+                email: email
+            },
+            data: {
+                method,
+                isVerified
+            },
+            include: {
+                accounts: true
+            }
+        });
+        return user;
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([

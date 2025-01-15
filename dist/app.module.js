@@ -8,10 +8,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const auth_module_1 = require("./auth/auth.module");
+const email_confirmation_module_1 = require("./auth/email-confirmation/email-confirmation.module");
+const provider_module_1 = require("./auth/provider/provider.module");
 const captcha_module_1 = require("./captcha/captcha.module");
 const is_dev_util_1 = require("./libs/common/utils/is-dev.util");
+const mail_module_1 = require("./libs/mail/mail.module");
 const prisma_module_1 = require("./prisma/prisma.module");
-const provider_module_1 = require("./provider/provider.module");
 const user_module_1 = require("./user/user.module");
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
@@ -29,7 +31,9 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             user_module_1.UserModule,
             provider_module_1.ProviderModule,
-            captcha_module_1.CaptchaModule
+            captcha_module_1.CaptchaModule,
+            mail_module_1.MailModule,
+            email_confirmation_module_1.EmailConfirmationModule
         ]
     })
 ], AppModule);

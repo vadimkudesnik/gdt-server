@@ -8,17 +8,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
+const email_confirmation_service_1 = require("./email-confirmation/email-confirmation.service");
+const provider_service_1 = require("./provider/provider.service");
+const prisma_service_1 = require("../prisma/prisma.service");
 const user_service_1 = require("../user/user.service");
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const argon2_1 = require("argon2");
 const __generated__1 = require("../../prisma/__generated__/index.js");
 let AuthService = class AuthService {
-    constructor(userService, configService) {
+    constructor(prismaService, userService, configService, providerService, emailConfirmationService) {
+        this.prismaService = prismaService;
         this.userService = userService;
         this.configService = configService;
+        this.providerService = providerService;
+        this.emailConfirmationService = emailConfirmationService;
     }
     async register(request, dto) {
         const isExistEmail = await this.userService.findByEmail(dto.email);
@@ -29,8 +38,9 @@ let AuthService = class AuthService {
         if (isExistLogin) {
             throw new common_1.ConflictException('Пользователь с данным логином уже существует.');
         }
-        const newUser = await this.userService.create(dto.login, dto.email, dto.password, dto.name, dto.surname, dto.secondname, '', __generated__1.AuthMethod.CREDENTIAL, false);
-        return this.saveSession(request, newUser);
+        return {
+            message: 'Вы зарегестрированы. Войдите в систему.'
+        };
     }
     async login(request, dto) {
         const user = await this.userService.findByLogin(dto.login);
@@ -52,6 +62,57 @@ let AuthService = class AuthService {
         if (!isValidPassword) {
             throw new common_1.UnauthorizedException('Неверный пароль.');
         }
+        if (!user.isVerified) {
+            await this.emailConfirmationService.sendVerificationToken(user);
+            throw new common_1.UnauthorizedException('Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.');
+        }
+        return this.saveSession(request, user);
+    }
+    async extractProfileFromCode(request, provider, code) {
+        const providerInstance = this.providerService.findByService(provider);
+        const profile = await providerInstance.findUserByCode(code);
+        const account = await this.prismaService.account.findFirst({
+            where: {
+                id: profile.id,
+                provider: profile.provider
+            }
+        });
+        let user = account?.userId
+            ? await this.userService.findById(account.userId)
+            : null;
+        if (user) {
+            return this.saveSession(request, user);
+        }
+        const isExistEmail = await this.userService.findByEmail(profile.email);
+        if (isExistEmail) {
+            user = await this.userService.edit(profile.email, __generated__1.AuthMethod[profile.provider.toUpperCase()], true);
+            if (!account) {
+                await this.prismaService.account.create({
+                    data: {
+                        userId: user.id,
+                        type: 'oauth',
+                        provider: profile.provider,
+                        accessToken: profile.access_token,
+                        refreshToken: profile.refresh_token,
+                        expiresAt: profile.expires_at
+                    }
+                });
+            }
+            return this.saveSession(request, user);
+        }
+        user = await this.userService.create(this.makeString(), profile.email, this.makeString(), profile.name, '', '', profile.picture, __generated__1.AuthMethod[profile.provider.toUpperCase()], true);
+        if (!account) {
+            await this.prismaService.account.create({
+                data: {
+                    userId: user.id,
+                    type: 'oauth',
+                    provider: profile.provider,
+                    accessToken: profile.access_token,
+                    refreshToken: profile.refresh_token,
+                    expiresAt: profile.expires_at
+                }
+            });
+        }
         return this.saveSession(request, user);
     }
     async logout(request, response) {
@@ -64,6 +125,14 @@ let AuthService = class AuthService {
                 resolve();
             });
         });
+    }
+    makeString() {
+        let outString = '';
+        const inOptions = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        for (let i = 0; i < 8; i++) {
+            outString += inOptions.charAt(Math.floor(Math.random() * inOptions.length));
+        }
+        return outString;
     }
     async saveSession(request, user) {
         return new Promise((resolve, reject) => {
@@ -80,7 +149,11 @@ let AuthService = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [user_service_1.UserService,
-        config_1.ConfigService])
+    __param(4, (0, common_1.Inject)((0, common_1.forwardRef)(() => email_confirmation_service_1.EmailConfirmationService))),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        user_service_1.UserService,
+        config_1.ConfigService,
+        provider_service_1.ProviderService,
+        email_confirmation_service_1.EmailConfirmationService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

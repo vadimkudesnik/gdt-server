@@ -81,4 +81,25 @@ export class UserService {
 		})
 		return user
 	}
+
+	public async edit(
+		email: string,
+		method: AuthMethod,
+		isVerified: boolean
+	): Promise<User> {
+		const user = await this.prismaService.user.update({
+			where: {
+				email: email
+			},
+			data: {
+				method,
+				isVerified
+			},
+			include: {
+				accounts: true
+			}
+		})
+
+		return user
+	}
 }

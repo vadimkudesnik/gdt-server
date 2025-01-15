@@ -7,4 +7,5 @@ export declare class UserService {
     findByEmail(email: string): Promise<User>;
     findByLogin(login: string): Promise<User>;
     create(login: string, email: string, password: string, name: string, surname: string, secondname: string, picture: string, method: AuthMethod, isVerified: boolean): Promise<User>;
+    edit(email: string, method: AuthMethod, isVerified: boolean): Promise<User>;
 }
