@@ -5,7 +5,6 @@ import { RegisterDTO } from './dto/register.dto';
 import { ProviderService } from './provider/provider.service';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
-import { User } from 'prisma/__generated__';
 export declare class AuthController {
     private readonly authService;
     private readonly configService;
@@ -14,11 +13,47 @@ export declare class AuthController {
     register(request: Request, dto: RegisterDTO): Promise<{
         message: string;
     }>;
-    loginEmail(request: Request, dto: LoginEmailDTO): Promise<User>;
-    login(request: Request, dto: LoginDTO): Promise<User>;
+    loginEmail(request: Request, dto: LoginEmailDTO): Promise<import("../captcha/types/captcha.type").TypeCaptcha | {
+        name: string;
+        id: string;
+        login: string;
+        email: string;
+        password: string;
+        surname: string;
+        secondname: string | null;
+        picture: string | null;
+        isAdmin: boolean;
+        isNewsManager: boolean;
+        isVerified: boolean;
+        isTwoFactorEnabled: boolean;
+        method: import("prisma/__generated__").$Enums.AuthMethod;
+        createdAt: Date;
+        updatedAt: Date;
+    } | {
+        message: string;
+    }>;
+    login(request: Request, dto: LoginDTO): Promise<import("../captcha/types/captcha.type").TypeCaptcha | {
+        name: string;
+        id: string;
+        login: string;
+        email: string;
+        password: string;
+        surname: string;
+        secondname: string | null;
+        picture: string | null;
+        isAdmin: boolean;
+        isNewsManager: boolean;
+        isVerified: boolean;
+        isTwoFactorEnabled: boolean;
+        method: import("prisma/__generated__").$Enums.AuthMethod;
+        createdAt: Date;
+        updatedAt: Date;
+    } | {
+        message: string;
+    }>;
     callback(request: Request, response: Response, code: string, provider: string): Promise<void>;
     connect(provider: string): Promise<{
         url: string;
     }>;
-    logout(request: Request, response: Response): Promise<void>;
+    logout(request: Request, response: Response): Promise<boolean>;
 }

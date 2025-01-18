@@ -72,7 +72,7 @@ let UserService = class UserService {
         });
         return user;
     }
-    async edit(email, method, isVerified) {
+    async editVerified(email, method, isVerified) {
         const user = await this.prismaService.user.update({
             where: {
                 email: email
@@ -86,6 +86,23 @@ let UserService = class UserService {
             }
         });
         return user;
+    }
+    async update(userId, dto) {
+        const user = await this.findById(userId);
+        const updatedUser = await this.prismaService.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                login: dto.login,
+                email: dto.email,
+                name: dto.name,
+                surname: dto.surname,
+                secondname: dto.secondname,
+                isTwoFactorEnabled: dto.isTwoFactorEnabled
+            }
+        });
+        return updatedUser;
     }
 };
 exports.UserService = UserService;

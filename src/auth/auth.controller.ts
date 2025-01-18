@@ -22,7 +22,6 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Request, Response } from 'express'
-import { User } from 'prisma/__generated__'
 
 @Controller('auth')
 export class AuthController {
@@ -50,17 +49,14 @@ export class AuthController {
 	public async loginEmail(
 		@Req() request: Request,
 		@Body() dto: LoginEmailDTO
-	): Promise<User> {
+	) {
 		return this.authService.loginEmail(request, dto)
 	}
 
 	@Unauthorized()
 	@Post('login')
 	@HttpCode(HttpStatus.OK)
-	public async login(
-		@Req() request: Request,
-		@Body() dto: LoginDTO
-	): Promise<User> {
+	public async login(@Req() request: Request, @Body() dto: LoginDTO) {
 		return this.authService.login(request, dto)
 	}
 
@@ -105,7 +101,8 @@ export class AuthController {
 	public async logout(
 		@Req() request: Request,
 		@Res({ passthrough: true }) response: Response
-	): Promise<void> {
-		return this.authService.logout(request, response)
+	) {
+		await this.authService.logout(request, response)
+		return true
 	}
 }

@@ -26,4 +26,21 @@ __decorate([
     (0, class_validator_1.MaxLength)(40, { message: 'Паоль должен содержать не более 40 символов.' }),
     __metadata("design:type", String)
 ], LoginDTO.prototype, "password", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({
+        message: 'Код двухфакторной аутентификации должен быть строковыми данными.'
+    }),
+    __metadata("design:type", String)
+], LoginDTO.prototype, "code", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'Captcha должен быть строковыми данными.' }),
+    __metadata("design:type", String)
+], LoginDTO.prototype, "captchaToken", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'Captcha должен быть строковыми данными.' }),
+    __metadata("design:type", String)
+], LoginDTO.prototype, "captchaAnswer", void 0);
 //# sourceMappingURL=login.dto.js.map

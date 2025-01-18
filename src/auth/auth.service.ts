@@ -3,6 +3,8 @@ import { LoginDTO } from './dto/login.dto'
 import { RegisterDTO } from './dto/register.dto'
 import { EmailConfirmationService } from './email-confirmation/email-confirmation.service'
 import { ProviderService } from './provider/provider.service'
+import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
+import { CaptchaService } from '@/captcha/captcha.service'
 import { parseBoolean } from '@/libs/common/utils/parse-boolean.util'
 import { PrismaService } from '@/prisma/prisma.service'
 import { UserService } from '@/user/user.service'
@@ -28,7 +30,9 @@ export class AuthService {
 		private readonly configService: ConfigService,
 		private readonly providerService: ProviderService,
 		@Inject(forwardRef(() => EmailConfirmationService))
-		private readonly emailConfirmationService: EmailConfirmationService
+		private readonly emailConfirmationService: EmailConfirmationService,
+		private readonly twoFactorAuthService: TwoFactorAuthService,
+		private readonly captchaService: CaptchaService
 	) {}
 
 	public async register(
@@ -65,7 +69,9 @@ export class AuthService {
 		)
 		const enabledEmail = this.configService.getOrThrow<string>('MAIL')
 		if (parseBoolean(enabledEmail)) {
-			await this.emailConfirmationService.sendVerificationToken(newUser)
+			await this.emailConfirmationService.sendVerificationToken(
+				newUser.email
+			)
 
 			return {
 				message:
@@ -80,47 +86,125 @@ export class AuthService {
 		}
 	}
 
-	public async login(request: Request, dto: LoginDTO): Promise<User> {
+	public async login(request: Request, dto: LoginDTO) {
 		const user = await this.userService.findByLogin(dto.login)
+
 		if (!user || !user.password) {
 			throw new NotFoundException('Пользователь не найден.')
 		}
+
 		const isValidPassword = await verify(user.password, dto.password)
+
 		if (!isValidPassword) {
-			throw new UnauthorizedException('Неверный паорь.')
+			throw new UnauthorizedException('Неверный паороль.')
 		}
+
 		const enabledEmail = this.configService.getOrThrow<string>('MAIL')
+
 		if (parseBoolean(enabledEmail)) {
 			if (!user.isVerified) {
-				await this.emailConfirmationService.sendVerificationToken(user)
+				await this.emailConfirmationService.sendVerificationToken(
+					user.email
+				)
 				throw new UnauthorizedException(
 					'Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.'
 				)
 			}
 		}
 
+		if (user.isTwoFactorEnabled) {
+			if (!dto.code) {
+				await this.twoFactorAuthService.sendTwoFactorAuthToken(
+					user.email
+				)
+
+				return {
+					message:
+						'Проверьте Вашу почту. Требуется код двхфакторной аутентификации.'
+				}
+			}
+
+			await this.twoFactorAuthService.validateTwoFactorToken(
+				user.email,
+				dto.code
+			)
+		}
+
+		if (!user.isTwoFactorEnabled) {
+			if (!dto.captchaAnswer) {
+				return this.captchaService.generateCaptcha()
+			}
+
+			const validate = await this.captchaService.validateCaptcha(
+				dto.captchaAnswer,
+				dto.captchaToken
+			)
+
+			if (!validate.valid) {
+				throw new UnauthorizedException('Не пройдена проверка CAPTCHA')
+			}
+		}
+
 		return this.saveSession(request, user)
 	}
 
-	public async loginEmail(
-		request: Request,
-		dto: LoginEmailDTO
-	): Promise<User> {
+	public async loginEmail(request: Request, dto: LoginEmailDTO) {
 		const user = await this.userService.findByEmail(dto.email)
+
 		if (!user || !user.password) {
 			throw new NotFoundException('Пользователь не найден.')
 		}
+
 		const isValidPassword = await verify(user.password, dto.password)
+
 		if (!isValidPassword) {
 			throw new UnauthorizedException('Неверный пароль.')
 		}
+
 		const enabledEmail = this.configService.getOrThrow<string>('MAIL')
+
 		if (parseBoolean(enabledEmail)) {
 			if (!user.isVerified) {
-				await this.emailConfirmationService.sendVerificationToken(user)
+				await this.emailConfirmationService.sendVerificationToken(
+					user.email
+				)
+
 				throw new UnauthorizedException(
 					'Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.'
 				)
+			}
+		}
+
+		if (user.isTwoFactorEnabled) {
+			if (!dto.code) {
+				await this.twoFactorAuthService.sendTwoFactorAuthToken(
+					user.email
+				)
+
+				return {
+					message:
+						'Проверьте Вашу почту. Требуется код двхфакторной аутентификации.'
+				}
+			}
+
+			await this.twoFactorAuthService.validateTwoFactorToken(
+				user.email,
+				dto.code
+			)
+		}
+
+		if (!user.isTwoFactorEnabled) {
+			if (!dto.captchaAnswer) {
+				return this.captchaService.generateCaptcha()
+			}
+
+			const validate = await this.captchaService.validateCaptcha(
+				dto.captchaAnswer,
+				dto.captchaToken
+			)
+
+			if (!validate.valid) {
+				throw new UnauthorizedException('Не пройдена проверка CAPTCHA')
 			}
 		}
 
@@ -153,7 +237,7 @@ export class AuthService {
 		const isExistEmail = await this.userService.findByEmail(profile.email)
 
 		if (isExistEmail) {
-			user = await this.userService.edit(
+			user = await this.userService.editVerified(
 				profile.email,
 				AuthMethod[profile.provider.toUpperCase()],
 				true

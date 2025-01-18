@@ -1,3 +1,4 @@
+import { UpdateUserDTO } from './dto/update-user.dto'
 import { PrismaService } from '@/prisma/prisma.service'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { hash } from 'argon2'
@@ -82,7 +83,7 @@ export class UserService {
 		return user
 	}
 
-	public async edit(
+	public async editVerified(
 		email: string,
 		method: AuthMethod,
 		isVerified: boolean
@@ -101,5 +102,25 @@ export class UserService {
 		})
 
 		return user
+	}
+
+	public async update(userId: string, dto: UpdateUserDTO) {
+		const user = await this.findById(userId)
+
+		const updatedUser = await this.prismaService.user.update({
+			where: {
+				id: user.id
+			},
+			data: {
+				login: dto.login,
+				email: dto.email,
+				name: dto.name,
+				surname: dto.surname,
+				secondname: dto.secondname,
+				isTwoFactorEnabled: dto.isTwoFactorEnabled
+			}
+		})
+
+		return updatedUser
 	}
 }

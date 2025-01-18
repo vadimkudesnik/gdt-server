@@ -52,7 +52,8 @@ let AuthController = class AuthController {
         };
     }
     async logout(request, response) {
-        return this.authService.logout(request, response);
+        await this.authService.logout(request, response);
+        return true;
     }
 };
 exports.AuthController = AuthController;

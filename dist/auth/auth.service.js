@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const email_confirmation_service_1 = require("./email-confirmation/email-confirmation.service");
 const provider_service_1 = require("./provider/provider.service");
+const two_factor_auth_service_1 = require("./two-factor-auth/two-factor-auth.service");
+const captcha_service_1 = require("../captcha/captcha.service");
 const parse_boolean_util_1 = require("../libs/common/utils/parse-boolean.util");
 const prisma_service_1 = require("../prisma/prisma.service");
 const user_service_1 = require("../user/user.service");
@@ -23,12 +25,14 @@ const config_1 = require("@nestjs/config");
 const argon2_1 = require("argon2");
 const __generated__1 = require("../../prisma/__generated__/index.js");
 let AuthService = class AuthService {
-    constructor(prismaService, userService, configService, providerService, emailConfirmationService) {
+    constructor(prismaService, userService, configService, providerService, emailConfirmationService, twoFactorAuthService, captchaService) {
         this.prismaService = prismaService;
         this.userService = userService;
         this.configService = configService;
         this.providerService = providerService;
         this.emailConfirmationService = emailConfirmationService;
+        this.twoFactorAuthService = twoFactorAuthService;
+        this.captchaService = captchaService;
     }
     async register(request, dto) {
         const isExistEmail = await this.userService.findByEmail(dto.email);
@@ -42,7 +46,7 @@ let AuthService = class AuthService {
         const newUser = await this.userService.create(dto.login, dto.email, dto.password, dto.name, dto.surname, dto.secondname, '', __generated__1.AuthMethod.CREDENTIAL, false);
         const enabledEmail = this.configService.getOrThrow('MAIL');
         if ((0, parse_boolean_util_1.parseBoolean)(enabledEmail)) {
-            await this.emailConfirmationService.sendVerificationToken(newUser);
+            await this.emailConfirmationService.sendVerificationToken(newUser.email);
             return {
                 message: 'Пожалуйста подтвердите Ваш email или войдите в систему.'
             };
@@ -60,13 +64,31 @@ let AuthService = class AuthService {
         }
         const isValidPassword = await (0, argon2_1.verify)(user.password, dto.password);
         if (!isValidPassword) {
-            throw new common_1.UnauthorizedException('Неверный паорь.');
+            throw new common_1.UnauthorizedException('Неверный паороль.');
         }
         const enabledEmail = this.configService.getOrThrow('MAIL');
         if ((0, parse_boolean_util_1.parseBoolean)(enabledEmail)) {
             if (!user.isVerified) {
-                await this.emailConfirmationService.sendVerificationToken(user);
+                await this.emailConfirmationService.sendVerificationToken(user.email);
                 throw new common_1.UnauthorizedException('Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.');
+            }
+        }
+        if (user.isTwoFactorEnabled) {
+            if (!dto.code) {
+                await this.twoFactorAuthService.sendTwoFactorAuthToken(user.email);
+                return {
+                    message: 'Проверьте Вашу почту. Требуется код двхфакторной аутентификации.'
+                };
+            }
+            await this.twoFactorAuthService.validateTwoFactorToken(user.email, dto.code);
+        }
+        if (!user.isTwoFactorEnabled) {
+            if (!dto.captchaAnswer) {
+                return this.captchaService.generateCaptcha();
+            }
+            const validate = await this.captchaService.validateCaptcha(dto.captchaAnswer, dto.captchaToken);
+            if (!validate.valid) {
+                throw new common_1.UnauthorizedException('Не пройдена проверка CAPTCHA');
             }
         }
         return this.saveSession(request, user);
@@ -83,8 +105,26 @@ let AuthService = class AuthService {
         const enabledEmail = this.configService.getOrThrow('MAIL');
         if ((0, parse_boolean_util_1.parseBoolean)(enabledEmail)) {
             if (!user.isVerified) {
-                await this.emailConfirmationService.sendVerificationToken(user);
+                await this.emailConfirmationService.sendVerificationToken(user.email);
                 throw new common_1.UnauthorizedException('Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.');
+            }
+        }
+        if (user.isTwoFactorEnabled) {
+            if (!dto.code) {
+                await this.twoFactorAuthService.sendTwoFactorAuthToken(user.email);
+                return {
+                    message: 'Проверьте Вашу почту. Требуется код двхфакторной аутентификации.'
+                };
+            }
+            await this.twoFactorAuthService.validateTwoFactorToken(user.email, dto.code);
+        }
+        if (!user.isTwoFactorEnabled) {
+            if (!dto.captchaAnswer) {
+                return this.captchaService.generateCaptcha();
+            }
+            const validate = await this.captchaService.validateCaptcha(dto.captchaAnswer, dto.captchaToken);
+            if (!validate.valid) {
+                throw new common_1.UnauthorizedException('Не пройдена проверка CAPTCHA');
             }
         }
         return this.saveSession(request, user);
@@ -106,7 +146,7 @@ let AuthService = class AuthService {
         }
         const isExistEmail = await this.userService.findByEmail(profile.email);
         if (isExistEmail) {
-            user = await this.userService.edit(profile.email, __generated__1.AuthMethod[profile.provider.toUpperCase()], true);
+            user = await this.userService.editVerified(profile.email, __generated__1.AuthMethod[profile.provider.toUpperCase()], true);
             if (!account) {
                 await this.prismaService.account.create({
                     data: {
@@ -175,6 +215,8 @@ exports.AuthService = AuthService = __decorate([
         user_service_1.UserService,
         config_1.ConfigService,
         provider_service_1.ProviderService,
-        email_confirmation_service_1.EmailConfirmationService])
+        email_confirmation_service_1.EmailConfirmationService,
+        two_factor_auth_service_1.TwoFactorAuthService,
+        captcha_service_1.CaptchaService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

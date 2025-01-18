@@ -9,7 +9,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const auth_module_1 = require("./auth/auth.module");
 const email_confirmation_module_1 = require("./auth/email-confirmation/email-confirmation.module");
+const password_recovery_module_1 = require("./auth/password-recovery/password-recovery.module");
 const provider_module_1 = require("./auth/provider/provider.module");
+const two_factor_auth_module_1 = require("./auth/two-factor-auth/two-factor-auth.module");
 const captcha_module_1 = require("./captcha/captcha.module");
 const is_dev_util_1 = require("./libs/common/utils/is-dev.util");
 const mail_module_1 = require("./libs/mail/mail.module");
@@ -33,7 +35,9 @@ exports.AppModule = AppModule = __decorate([
             provider_module_1.ProviderModule,
             captcha_module_1.CaptchaModule,
             mail_module_1.MailModule,
-            email_confirmation_module_1.EmailConfirmationModule
+            email_confirmation_module_1.EmailConfirmationModule,
+            password_recovery_module_1.PasswordRecoveryModule,
+            two_factor_auth_module_1.TwoFactorAuthModule
         ]
     })
 ], AppModule);

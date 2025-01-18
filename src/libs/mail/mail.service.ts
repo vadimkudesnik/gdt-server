@@ -1,4 +1,6 @@
-import { ConfirmationTemlate } from './template/confirmation.temlate'
+import { ConfirmationTemlate } from './templates/confirmation.template'
+import { ResetPasswordTemplate } from './templates/reset.template'
+import { TwoFatorAuthTemplate } from './templates/two-factor-auth.template'
 import { MailerService } from '@nestjs-modules/mailer'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
@@ -13,11 +15,26 @@ export class MailService {
 
 	public async sendConfirmationEmail(email: string, token: string) {
 		const domain =
-			await this.configService.getOrThrow<string>('APPLICATION_URL')
+			await this.configService.getOrThrow<string>('ALLOWED_ORIGIN')
 
 		const html = await render(ConfirmationTemlate({ domain, token }))
 
 		return this.sendMail(email, 'Подтвеждение почты GDT', html)
+	}
+
+	public async sendResetEmail(email: string, token: string) {
+		const domain =
+			await this.configService.getOrThrow<string>('ALLOWED_ORIGIN')
+
+		const html = await render(ResetPasswordTemplate({ domain, token }))
+
+		return this.sendMail(email, 'Сброс пароля GDT', html)
+	}
+
+	public async sendTwoFactoEmail(email: string, token: string) {
+		const html = await render(TwoFatorAuthTemplate({ token }))
+
+		return this.sendMail(email, 'Подтверждение личности', html)
 	}
 
 	private sendMail(email: string, subject: string, html: string) {

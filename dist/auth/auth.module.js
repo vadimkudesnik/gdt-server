@@ -11,6 +11,8 @@ const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
 const email_confirmation_module_1 = require("./email-confirmation/email-confirmation.module");
 const provider_module_1 = require("./provider/provider.module");
+const two_factor_auth_service_1 = require("./two-factor-auth/two-factor-auth.service");
+const captcha_service_1 = require("../captcha/captcha.service");
 const providers_config_1 = require("../config/providers.config");
 const mail_service_1 = require("../libs/mail/mail.service");
 const user_service_1 = require("../user/user.service");
@@ -30,7 +32,13 @@ exports.AuthModule = AuthModule = __decorate([
             (0, common_1.forwardRef)(() => email_confirmation_module_1.EmailConfirmationModule)
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, mail_service_1.MailService, user_service_1.UserService],
+        providers: [
+            auth_service_1.AuthService,
+            mail_service_1.MailService,
+            user_service_1.UserService,
+            two_factor_auth_service_1.TwoFactorAuthService,
+            captcha_service_1.CaptchaService
+        ],
         exports: [auth_service_1.AuthService]
     })
 ], AuthModule);

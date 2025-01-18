@@ -13,6 +13,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
+const update_user_dto_1 = require("./dto/update-user.dto");
 const user_service_1 = require("./user.service");
 const admin_decorator_1 = require("../auth/decorators/admin.decorator");
 const auth_decorator_1 = require("../auth/decorators/auth.decorator");
@@ -27,6 +28,9 @@ let UserController = class UserController {
     }
     async findById(id) {
         return this.userService.findById(id);
+    }
+    async updateProfile(userId, dto) {
+        return this.userService.update(userId, dto);
     }
 };
 exports.UserController = UserController;
@@ -48,6 +52,16 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findById", null);
+__decorate([
+    (0, auth_decorator_1.Authorization)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, common_1.Patch)('profile'),
+    __param(0, (0, authorized_decorator_1.Athorized)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDTO]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "updateProfile", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])

@@ -1,46 +1,60 @@
-import { AuthService } from '../auth.service'
-import { ConfirmationDto } from './dto/confirmation.dto'
+import { NewPasswordDto } from './dto/new-password.dto'
+import { ResetPasswordDto } from './dto/reset-password.dto'
 import { MailService } from '@/libs/mail/mail.service'
 import { PrismaService } from '@/prisma/prisma.service'
 import { UserService } from '@/user/user.service'
 import {
 	BadRequestException,
-	forwardRef,
-	Inject,
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
-import { Request } from 'express'
-import { TokenType, User } from 'prisma/__generated__'
+import { hash } from 'argon2'
+import { TokenType } from 'prisma/__generated__'
 import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
-export class EmailConfirmationService {
+export class PasswordRecoveryService {
 	public constructor(
 		private readonly prismaService: PrismaService,
 		private readonly mailService: MailService,
-		private readonly userService: UserService,
-		@Inject(forwardRef(() => AuthService))
-		private readonly authService: AuthService
+		private readonly userService: UserService
 	) {}
 
-	public async newVerification(request: Request, dto: ConfirmationDto) {
-		const existingToken = await this.prismaService.token.findUnique({
+	public async resetPassword(dto: ResetPasswordDto) {
+		const existingUser = await this.userService.findByEmail(dto.email)
+		if (!existingUser) {
+			throw new NotFoundException('Пользователь не найден.')
+		}
+
+		const passwordResetToken = await this.generatePasswordResetToken(
+			existingUser.email
+		)
+
+		await this.mailService.sendResetEmail(
+			existingUser.email,
+			passwordResetToken.token
+		)
+
+		return true
+	}
+
+	public async newPassword(dto: NewPasswordDto, token: string) {
+		const existingToken = await this.prismaService.token.findFirst({
 			where: {
-				token: dto.token,
-				type: TokenType.VERIFICATION
+				token: token,
+				type: TokenType.PASSWORD_RESET
 			}
 		})
 
 		if (!existingToken) {
-			throw new NotFoundException('Токен подтверждения не найден.')
+			throw new NotFoundException('Токен не найден.')
 		}
 
 		const hasExpired = new Date(existingToken.expiresIn) < new Date()
 
 		if (hasExpired) {
 			throw new BadRequestException(
-				'Токен подтверждения истек. Запросите новый токен.'
+				'Токен сброса пароля истек. Запросите новый токен.'
 			)
 		}
 
@@ -59,39 +73,28 @@ export class EmailConfirmationService {
 				id: existingUser.id
 			},
 			data: {
-				isVerified: true
+				password: await hash(dto.password)
 			}
 		})
 
 		await this.prismaService.token.delete({
 			where: {
 				id: existingToken.id,
-				type: TokenType.VERIFICATION
+				type: TokenType.PASSWORD_RESET
 			}
 		})
-
-		return this.authService.saveSession(request, existingUser)
-	}
-
-	public async sendVerificationToken(email: string) {
-		const verificationToken = await this.generateVerificationToken(email)
-
-		await this.mailService.sendConfirmationEmail(
-			verificationToken.email,
-			verificationToken.token
-		)
 
 		return true
 	}
 
-	private async generateVerificationToken(email: string) {
+	private async generatePasswordResetToken(email: string) {
 		const token = uuidv4()
 		const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
 
 		const existingToken = await this.prismaService.token.findFirst({
 			where: {
 				email,
-				type: TokenType.VERIFICATION
+				type: TokenType.PASSWORD_RESET
 			}
 		})
 
@@ -99,20 +102,20 @@ export class EmailConfirmationService {
 			await this.prismaService.token.delete({
 				where: {
 					id: existingToken.id,
-					type: TokenType.VERIFICATION
+					type: TokenType.PASSWORD_RESET
 				}
 			})
 		}
 
-		const verificationToken = await this.prismaService.token.create({
+		const passwordResetToken = await this.prismaService.token.create({
 			data: {
 				email,
 				token,
 				expiresIn,
-				type: TokenType.VERIFICATION
+				type: TokenType.PASSWORD_RESET
 			}
 		})
 
-		return verificationToken
+		return passwordResetToken
 	}
 }

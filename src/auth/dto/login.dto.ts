@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator'
+import {
+	IsNotEmpty,
+	IsOptional,
+	IsString,
+	MaxLength,
+	MinLength
+} from 'class-validator'
 
 export class LoginDTO {
 	@IsString({ message: 'Логин должен быть строковыми данными.' })
@@ -10,4 +16,19 @@ export class LoginDTO {
 	@MinLength(8, { message: 'Пароль должен содержать минимум 8 символов.' })
 	@MaxLength(40, { message: 'Паоль должен содержать не более 40 символов.' })
 	password: string
+
+	@IsOptional()
+	@IsString({
+		message:
+			'Код двухфакторной аутентификации должен быть строковыми данными.'
+	})
+	code: string
+
+	@IsOptional()
+	@IsString({ message: 'Captcha должен быть строковыми данными.' })
+	captchaToken: string
+
+	@IsOptional()
+	@IsString({ message: 'Captcha должен быть строковыми данными.' })
+	captchaAnswer: string
 }
