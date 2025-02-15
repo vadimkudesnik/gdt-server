@@ -35,12 +35,20 @@ export class AuthService {
 		private readonly captchaService: CaptchaService
 	) {}
 
-	public async register(
-		request: Request,
-		dto: RegisterDTO
-	): Promise<{
-		message: string
-	}> {
+	public async register(request: Request, dto: RegisterDTO) {
+		if (!dto.captchaAnswer) {
+			return this.captchaService.generateCaptcha()
+		}
+
+		const validate = await this.captchaService.validateCaptcha(
+			dto.captchaAnswer,
+			dto.captchaToken
+		)
+
+		if (!validate.valid) {
+			throw new UnauthorizedException('Не пройдена проверка CAPTCHA')
+		}
+
 		const isExistEmail = await this.userService.findByEmail(dto.email)
 		const isExistLogin = await this.userService.findByLogin(dto.login)
 
@@ -87,6 +95,19 @@ export class AuthService {
 	}
 
 	public async login(request: Request, dto: LoginDTO) {
+		if (!dto.captchaAnswer) {
+			return this.captchaService.generateCaptcha()
+		}
+
+		const validate = await this.captchaService.validateCaptcha(
+			dto.captchaAnswer,
+			dto.captchaToken
+		)
+
+		if (!validate.valid) {
+			throw new UnauthorizedException('Не пройдена проверка CAPTCHA')
+		}
+
 		const user = await this.userService.findByLogin(dto.login)
 
 		if (!user || !user.password) {
@@ -96,7 +117,7 @@ export class AuthService {
 		const isValidPassword = await verify(user.password, dto.password)
 
 		if (!isValidPassword) {
-			throw new UnauthorizedException('Неверный паороль.')
+			throw new UnauthorizedException('Неверный пароль.')
 		}
 
 		const enabledEmail = this.configService.getOrThrow<string>('MAIL')
@@ -130,25 +151,23 @@ export class AuthService {
 			)
 		}
 
-		if (!user.isTwoFactorEnabled) {
-			if (!dto.captchaAnswer) {
-				return this.captchaService.generateCaptcha()
-			}
-
-			const validate = await this.captchaService.validateCaptcha(
-				dto.captchaAnswer,
-				dto.captchaToken
-			)
-
-			if (!validate.valid) {
-				throw new UnauthorizedException('Не пройдена проверка CAPTCHA')
-			}
-		}
-
 		return this.saveSession(request, user)
 	}
 
 	public async loginEmail(request: Request, dto: LoginEmailDTO) {
+		if (!dto.captchaAnswer) {
+			return this.captchaService.generateCaptcha()
+		}
+
+		const validate = await this.captchaService.validateCaptcha(
+			dto.captchaAnswer,
+			dto.captchaToken
+		)
+
+		if (!validate.valid) {
+			throw new UnauthorizedException('Не пройдена проверка CAPTCHA')
+		}
+
 		const user = await this.userService.findByEmail(dto.email)
 
 		if (!user || !user.password) {
@@ -191,21 +210,6 @@ export class AuthService {
 				user.email,
 				dto.code
 			)
-		}
-
-		if (!user.isTwoFactorEnabled) {
-			if (!dto.captchaAnswer) {
-				return this.captchaService.generateCaptcha()
-			}
-
-			const validate = await this.captchaService.validateCaptcha(
-				dto.captchaAnswer,
-				dto.captchaToken
-			)
-
-			if (!validate.valid) {
-				throw new UnauthorizedException('Не пройдена проверка CAPTCHA')
-			}
 		}
 
 		return this.saveSession(request, user)

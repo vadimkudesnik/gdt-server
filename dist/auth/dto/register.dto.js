@@ -57,4 +57,14 @@ __decorate([
     (0, class_validator_1.Validate)(is_password_matching_decorator_1.IsPasswordMatchingConstrait, { message: 'Пароли не совпадают' }),
     __metadata("design:type", String)
 ], RegisterDTO.prototype, "passwordRepeat", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'Captcha должен быть строковыми данными.' }),
+    __metadata("design:type", String)
+], RegisterDTO.prototype, "captchaToken", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'Captcha должен быть строковыми данными.' }),
+    __metadata("design:type", String)
+], RegisterDTO.prototype, "captchaAnswer", void 0);
 //# sourceMappingURL=register.dto.js.map

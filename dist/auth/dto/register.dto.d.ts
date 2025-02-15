@@ -6,4 +6,6 @@ export declare class RegisterDTO {
     surname: string;
     secondname: string;
     passwordRepeat: string;
+    captchaToken: string;
+    captchaAnswer: string;
 }

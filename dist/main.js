@@ -9,9 +9,14 @@ const core_1 = require("@nestjs/core");
 const connect_redis_1 = require("connect-redis");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const fs = require("fs");
 const ioredis_1 = require("ioredis");
 async function bootstrap() {
-    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const httpsOptions = {
+        key: fs.readFileSync('/etc/letsencrypt/live/sauschkin.ru/privkey.pem'),
+        cert: fs.readFileSync('/etc/letsencrypt/live/sauschkin.ru/cert.pem'),
+    };
+    const app = await core_1.NestFactory.create(app_module_1.AppModule, { httpsOptions });
     const config = app.get(config_1.ConfigService);
     const redis = new ioredis_1.default(config.getOrThrow('REDIS_URI'));
     app.use(cookieParser(config.getOrThrow('COOKIES_SECRET')));

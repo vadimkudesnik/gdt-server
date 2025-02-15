@@ -35,6 +35,13 @@ let AuthService = class AuthService {
         this.captchaService = captchaService;
     }
     async register(request, dto) {
+        if (!dto.captchaAnswer) {
+            return this.captchaService.generateCaptcha();
+        }
+        const validate = await this.captchaService.validateCaptcha(dto.captchaAnswer, dto.captchaToken);
+        if (!validate.valid) {
+            throw new common_1.UnauthorizedException('Не пройдена проверка CAPTCHA');
+        }
         const isExistEmail = await this.userService.findByEmail(dto.email);
         const isExistLogin = await this.userService.findByLogin(dto.login);
         if (isExistEmail) {
@@ -58,43 +65,14 @@ let AuthService = class AuthService {
         }
     }
     async login(request, dto) {
+        if (!dto.captchaAnswer) {
+            return this.captchaService.generateCaptcha();
+        }
+        const validate = await this.captchaService.validateCaptcha(dto.captchaAnswer, dto.captchaToken);
+        if (!validate.valid) {
+            throw new common_1.UnauthorizedException('Не пройдена проверка CAPTCHA');
+        }
         const user = await this.userService.findByLogin(dto.login);
-        if (!user || !user.password) {
-            throw new common_1.NotFoundException('Пользователь не найден.');
-        }
-        const isValidPassword = await (0, argon2_1.verify)(user.password, dto.password);
-        if (!isValidPassword) {
-            throw new common_1.UnauthorizedException('Неверный паороль.');
-        }
-        const enabledEmail = this.configService.getOrThrow('MAIL');
-        if ((0, parse_boolean_util_1.parseBoolean)(enabledEmail)) {
-            if (!user.isVerified) {
-                await this.emailConfirmationService.sendVerificationToken(user.email);
-                throw new common_1.UnauthorizedException('Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.');
-            }
-        }
-        if (user.isTwoFactorEnabled) {
-            if (!dto.code) {
-                await this.twoFactorAuthService.sendTwoFactorAuthToken(user.email);
-                return {
-                    message: 'Проверьте Вашу почту. Требуется код двхфакторной аутентификации.'
-                };
-            }
-            await this.twoFactorAuthService.validateTwoFactorToken(user.email, dto.code);
-        }
-        if (!user.isTwoFactorEnabled) {
-            if (!dto.captchaAnswer) {
-                return this.captchaService.generateCaptcha();
-            }
-            const validate = await this.captchaService.validateCaptcha(dto.captchaAnswer, dto.captchaToken);
-            if (!validate.valid) {
-                throw new common_1.UnauthorizedException('Не пройдена проверка CAPTCHA');
-            }
-        }
-        return this.saveSession(request, user);
-    }
-    async loginEmail(request, dto) {
-        const user = await this.userService.findByEmail(dto.email);
         if (!user || !user.password) {
             throw new common_1.NotFoundException('Пользователь не найден.');
         }
@@ -118,14 +96,39 @@ let AuthService = class AuthService {
             }
             await this.twoFactorAuthService.validateTwoFactorToken(user.email, dto.code);
         }
-        if (!user.isTwoFactorEnabled) {
-            if (!dto.captchaAnswer) {
-                return this.captchaService.generateCaptcha();
+        return this.saveSession(request, user);
+    }
+    async loginEmail(request, dto) {
+        if (!dto.captchaAnswer) {
+            return this.captchaService.generateCaptcha();
+        }
+        const validate = await this.captchaService.validateCaptcha(dto.captchaAnswer, dto.captchaToken);
+        if (!validate.valid) {
+            throw new common_1.UnauthorizedException('Не пройдена проверка CAPTCHA');
+        }
+        const user = await this.userService.findByEmail(dto.email);
+        if (!user || !user.password) {
+            throw new common_1.NotFoundException('Пользователь не найден.');
+        }
+        const isValidPassword = await (0, argon2_1.verify)(user.password, dto.password);
+        if (!isValidPassword) {
+            throw new common_1.UnauthorizedException('Неверный пароль.');
+        }
+        const enabledEmail = this.configService.getOrThrow('MAIL');
+        if ((0, parse_boolean_util_1.parseBoolean)(enabledEmail)) {
+            if (!user.isVerified) {
+                await this.emailConfirmationService.sendVerificationToken(user.email);
+                throw new common_1.UnauthorizedException('Ваш email не подтвержден. Пожалуйста проверьте почту и подтвердите адрес.');
             }
-            const validate = await this.captchaService.validateCaptcha(dto.captchaAnswer, dto.captchaToken);
-            if (!validate.valid) {
-                throw new common_1.UnauthorizedException('Не пройдена проверка CAPTCHA');
+        }
+        if (user.isTwoFactorEnabled) {
+            if (!dto.code) {
+                await this.twoFactorAuthService.sendTwoFactorAuthToken(user.email);
+                return {
+                    message: 'Проверьте Вашу почту. Требуется код двхфакторной аутентификации.'
+                };
             }
+            await this.twoFactorAuthService.validateTwoFactorToken(user.email, dto.code);
         }
         return this.saveSession(request, user);
     }

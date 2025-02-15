@@ -34,12 +34,7 @@ export class AuthController {
 	@Unauthorized()
 	@Post('register')
 	@HttpCode(HttpStatus.OK)
-	public async register(
-		@Req() request: Request,
-		@Body() dto: RegisterDTO
-	): Promise<{
-		message: string
-	}> {
+	public async register(@Req() request: Request, @Body() dto: RegisterDTO) {
 		return this.authService.register(request, dto)
 	}
 

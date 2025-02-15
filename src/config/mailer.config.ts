@@ -8,11 +8,18 @@ export const getMailerConfig = async (
 	transport: {
 		host: configService.getOrThrow<string>('MAIL_HOST'),
 		port: configService.getOrThrow<number>('MAIL_PORT'),
-		secure: !isDev(configService),
+		secure: false,
 		auth: {
+			type: 'login',
 			user: configService.getOrThrow<string>('MAIL_LOGIN'),
 			pass: configService.getOrThrow<string>('MAIL_PASSWORD')
-		}
+		},
+		ignoreTLS: true,
+		requireTLS: false,
+		tls: {
+			ciphers:'SSLv3'
+		},
+
 	},
 	defaults: {
 		from: `${configService.getOrThrow<string>('MAIL_LOGIN')}`

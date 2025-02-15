@@ -7,12 +7,20 @@ import { NestFactory } from '@nestjs/core'
 import { RedisStore } from 'connect-redis'
 import * as cookieParser from 'cookie-parser'
 import * as session from 'express-session'
+import * as fs from 'fs';
 import IORedis from 'ioredis'
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule)
+	const httpsOptions = {
+		key: fs.readFileSync('/etc/letsencrypt/live/sauschkin.ru/privkey.pem'),
+		cert: fs.readFileSync('/etc/letsencrypt/live/sauschkin.ru/cert.pem'),
+	}
+	
+	const app = await NestFactory.create(AppModule, { httpsOptions })
 	const config = app.get(ConfigService)
 	const redis = new IORedis(config.getOrThrow<string>('REDIS_URI'))
+
+
 
 	app.use(cookieParser(config.getOrThrow<string>('COOKIES_SECRET')))
 

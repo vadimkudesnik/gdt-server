@@ -10,45 +10,45 @@ export declare class AuthController {
     private readonly configService;
     private readonly providerService;
     constructor(authService: AuthService, configService: ConfigService, providerService: ProviderService);
-    register(request: Request, dto: RegisterDTO): Promise<{
+    register(request: Request, dto: RegisterDTO): Promise<import("../captcha/types/captcha.type").TypeCaptcha | {
         message: string;
     }>;
-    loginEmail(request: Request, dto: LoginEmailDTO): Promise<{
+    loginEmail(request: Request, dto: LoginEmailDTO): Promise<import("../captcha/types/captcha.type").TypeCaptcha | {
+        name: string;
+        id: string;
+        login: string;
         email: string;
         password: string;
-        login: string;
-        name: string;
         surname: string;
         secondname: string | null;
         picture: string | null;
-        id: string;
-        isTwoFactorEnabled: boolean;
         isAdmin: boolean;
         isNewsManager: boolean;
         isVerified: boolean;
+        isTwoFactorEnabled: boolean;
         method: import("prisma/__generated__").$Enums.AuthMethod;
         createdAt: Date;
         updatedAt: Date;
-    } | import("../captcha/types/captcha.type").TypeCaptcha | {
+    } | {
         message: string;
     }>;
-    login(request: Request, dto: LoginDTO): Promise<{
+    login(request: Request, dto: LoginDTO): Promise<import("../captcha/types/captcha.type").TypeCaptcha | {
+        name: string;
+        id: string;
+        login: string;
         email: string;
         password: string;
-        login: string;
-        name: string;
         surname: string;
         secondname: string | null;
         picture: string | null;
-        id: string;
-        isTwoFactorEnabled: boolean;
         isAdmin: boolean;
         isNewsManager: boolean;
         isVerified: boolean;
+        isTwoFactorEnabled: boolean;
         method: import("prisma/__generated__").$Enums.AuthMethod;
         createdAt: Date;
         updatedAt: Date;
-    } | import("../captcha/types/captcha.type").TypeCaptcha | {
+    } | {
         message: string;
     }>;
     callback(request: Request, response: Response, code: string, provider: string): Promise<void>;

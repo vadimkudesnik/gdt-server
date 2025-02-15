@@ -2,6 +2,7 @@ import { IsPasswordMatchingConstrait } from '@/libs/common/decorators/is-passwor
 import {
 	IsEmail,
 	IsNotEmpty,
+	IsOptional,
 	IsString,
 	MaxLength,
 	MinLength,
@@ -43,4 +44,12 @@ export class RegisterDTO {
 	@MaxLength(40, { message: 'Паоль должен содержать не более 40 символов.' })
 	@Validate(IsPasswordMatchingConstrait, { message: 'Пароли не совпадают' })
 	passwordRepeat: string
+
+	@IsOptional()
+	@IsString({ message: 'Captcha должен быть строковыми данными.' })
+	captchaToken: string
+
+	@IsOptional()
+	@IsString({ message: 'Captcha должен быть строковыми данными.' })
+	captchaAnswer: string
 }
