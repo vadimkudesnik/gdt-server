@@ -10,6 +10,7 @@ import { PrismaModule } from './prisma/prisma.module'
 import { UserModule } from './user/user.module'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { SwaggerModule } from './swagger/swagger.module'
 
 @Module({
 	imports: [
@@ -25,7 +26,8 @@ import { ConfigModule } from '@nestjs/config'
 		MailModule,
 		EmailConfirmationModule,
 		PasswordRecoveryModule,
-		TwoFactorAuthModule
+		TwoFactorAuthModule,
+		SwaggerModule
 	]
 })
 export class AppModule {}

@@ -9,6 +9,7 @@ import * as cookieParser from 'cookie-parser'
 import * as session from 'express-session'
 import * as fs from 'fs';
 import IORedis from 'ioredis'
+import { setupSwagger } from './swagger-setup'
 
 async function bootstrap() {
 	const httpsOptions = {
@@ -59,7 +60,10 @@ async function bootstrap() {
 			})
 		})
 	)
-
+	if (parseBoolean(config.getOrThrow<string>('SWAGGER_ENABLED'))) {
+		await setupSwagger(app)
+	}
+	
 	await app.listen(config.getOrThrow<number>('APPLICATION_PORT'))
 }
 bootstrap()

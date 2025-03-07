@@ -1,4 +1,7 @@
 node_modules
 dist
+prisma/__generated__
 .vscode
 package-lock.json
+bun.lock
+.env

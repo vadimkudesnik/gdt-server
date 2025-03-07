@@ -1,0 +1,255 @@
+openapi: 3.0.0
+paths:
+  /auth/register:
+    post:
+      operationId: AuthController_register
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDTO"
+      responses:
+        "200":
+          description: ""
+      tags:
+        &a1
+        - Auth
+  /auth/login_email:
+    post:
+      operationId: AuthController_loginEmail
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginEmailDTO"
+      responses:
+        "200":
+          description: ""
+      tags: *a1
+  /auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDTO"
+      responses:
+        "200":
+          description: ""
+      tags: *a1
+  "/auth/oauth/callback/{provider}":
+    get:
+      operationId: AuthController_callback
+      parameters:
+        - name: code
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: provider
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: *a1
+  "/auth/oauth/connect/{provider}":
+    get:
+      operationId: AuthController_connect
+      parameters:
+        - name: provider
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: *a1
+  /auth/logout:
+    post:
+      operationId: AuthController_logout
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a1
+  /auth/email-confirmation:
+    post:
+      operationId: EmailConfirmationController_newVerification
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmationDto"
+      responses:
+        "200":
+          description: ""
+      tags:
+        - EmailConfirmation
+  /users/profile:
+    get:
+      operationId: UserController_findProfile
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        &a2
+        - User
+    patch:
+      operationId: UserController_updateProfile
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDTO"
+      responses:
+        "200":
+          description: ""
+      tags: *a2
+  "/users/by-id/{id}":
+    get:
+      operationId: UserController_findById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: *a2
+  /captcha/generate:
+    get:
+      operationId: CaptchaController_generateCaptcha
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        &a3
+        - Captcha
+  /captcha/validate:
+    get:
+      operationId: CaptchaController_validateCaptcha
+      parameters:
+        - name: answer
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: token
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: *a3
+  "/auth/password-recovery/new/{token}":
+    post:
+      operationId: PasswordRecoveryController_newPaswword
+      parameters:
+        - name: token
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewPasswordDto"
+      responses:
+        "200":
+          description: ""
+      tags:
+        &a4
+        - PasswordRecovery
+  /auth/password-recovery/reset:
+    post:
+      operationId: PasswordRecoveryController_resetPassword
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordDto"
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /swagger/json:
+    get:
+      operationId: SwaggerController_getJson
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        &a5
+        - Swagger
+  /swagger/typescript:
+    get:
+      operationId: SwaggerController_getTypescript
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a5
+info:
+  title: Sauschkin.ru API
+  description: This project is a backend for the sauschkin.ru. It is developed
+    using modern technologies to ensure high performance, scalability, and ease
+    of use.
+  version: 1.0.0
+  contact:
+    name: Vadim Sauschkin
+    url: https://sauschkin.ru
+    email: help@sauschkin.ru
+tags: []
+servers:
+  - url: https://sauschkin.ru:4000
+    description: null
+    variables: null
+components:
+  schemas:
+    RegisterDTO:
+      type: object
+      properties: {}
+    LoginEmailDTO:
+      type: object
+      properties: {}
+    LoginDTO:
+      type: object
+      properties: {}
+    ConfirmationDto:
+      type: object
+      properties: {}
+    UpdateUserDTO:
+      type: object
+      properties: {}
+    NewPasswordDto:
+      type: object
+      properties: {}
+    ResetPasswordDto:
+      type: object
+      properties: {}
