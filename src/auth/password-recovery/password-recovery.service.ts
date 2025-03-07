@@ -1,3 +1,4 @@
+import { CaptchaService } from '@/captcha/captcha.service'
 import { NewPasswordDto } from './dto/new-password.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { MailService } from '@/libs/mail/mail.service'
@@ -6,7 +7,8 @@ import { UserService } from '@/user/user.service'
 import {
 	BadRequestException,
 	Injectable,
-	NotFoundException
+	NotFoundException,
+	UnauthorizedException
 } from '@nestjs/common'
 import { hash } from 'argon2'
 import { TokenType } from 'prisma/__generated__'
@@ -17,10 +19,24 @@ export class PasswordRecoveryService {
 	public constructor(
 		private readonly prismaService: PrismaService,
 		private readonly mailService: MailService,
-		private readonly userService: UserService
+		private readonly userService: UserService,
+		private readonly captchaService: CaptchaService
 	) {}
 
 	public async resetPassword(dto: ResetPasswordDto) {
+		if (!dto.captchaAnswer) {
+			return this.captchaService.generateCaptcha()
+		}
+
+		const validate = await this.captchaService.validateCaptcha(
+			dto.captchaAnswer,
+			dto.captchaToken
+		)
+
+		if (!validate.valid) {
+			throw new UnauthorizedException('Не пройдена проверка CAPTCHA')
+		}
+
 		const existingUser = await this.userService.findByEmail(dto.email)
 		if (!existingUser) {
 			throw new NotFoundException('Пользователь не найден.')
